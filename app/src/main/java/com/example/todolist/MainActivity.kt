@@ -14,13 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.todolist.ui.theme.ToDoListTheme
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.util.UUID
 
-data class Task(
-    val id: String = UUID.randomUUID().toString(),
-    val title: String = "",
-    val isImportant: Boolean = false
-)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,4 +28,6 @@ class MainActivity : ComponentActivity() {
         //}
     }
 }
+
+
 
