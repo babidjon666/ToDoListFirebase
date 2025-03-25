@@ -62,7 +62,6 @@ public fun MainScreen(){
                 modifier = Modifier.fillMaxWidth()
             )
             Row(modifier = Modifier.padding(top = 8.dp)) {
-                Text(text = "Important", modifier = Modifier.weight(1f))
                 OutlinedIconToggleButton(
                     checked = isImportant,
                     onCheckedChange = { isImportant = it }
@@ -81,7 +80,6 @@ public fun MainScreen(){
                         val newTask = Task(title = newTaskText)
                         db.collection("tasks").document(newTask.id).set(mapOf("title" to newTask.title, "isImportant" to newTask.isImportant))
                         newTaskText = ""
-                        isImportant = false
                     }
                 },
                 modifier = Modifier.padding(top = 16.dp)
@@ -93,7 +91,7 @@ public fun MainScreen(){
             {
                 items(tasks) { task ->
                     TaskItemComponent(task) {
-                        db.collection("task").document(task.id).delete()
+                        db.collection("tasks").document(task.id).delete()
                     }
                 }
             }

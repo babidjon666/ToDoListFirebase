@@ -11,7 +11,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.todolist.screens.LoginScreen
 import com.example.todolist.screens.MainScreen
+import com.example.todolist.screens.RegisterScreen
 import com.example.todolist.ui.theme.ToDoListTheme
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -22,10 +28,25 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MainScreen()
+            NavScreen()
         }
     }
 }
+
+@Composable
+fun NavScreen() {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "Register") {
+        composable("Register") {
+            RegisterScreen(navController)
+        }
+        composable("Login") {
+            LoginScreen(navController)
+        }
+    }
+}
+
 
 
 

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -27,6 +29,12 @@ public fun TaskItemComponent(task: Task, onDelete: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween)
         {
             Text(text=task.title, modifier = Modifier.weight(1f))
+            if(task.isImportant){
+                Icon(Icons.Default.Star, contentDescription = "Important")
+            }else{
+                Icon(Icons.Default.Warning, contentDescription = "Not Important")
+            }
+
             IconButton(onClick = onDelete) {
                 Icon(Icons.Default.Delete, contentDescription = "Delete")
             }
