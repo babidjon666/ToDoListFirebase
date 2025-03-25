@@ -1,5 +1,6 @@
 package com.example.todolist.screens
 
+import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,9 +24,25 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.util.Log
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+
+@OptIn(UnstableApi::class)
+private fun SignIn(navController: NavController, auth: FirebaseAuth, email: String, password: String){
+    auth.signInWithEmailAndPassword(email, password)
+        .addOnCompleteListener {
+            if(it.isSuccessful){
+                Log.d("MyLog", "Login Succesfull")
+                navController.navigate("Main/${email}")
+            }else{
+                Log.d("MyLog", "Login Failed")
+            }
+        }
+}
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -70,7 +87,7 @@ fun LoginScreen(navController: NavController) {
 
         Button(
             onClick = {
-
+                SignIn(navController, auth, emailState.value, passwordState.value)
             },
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium

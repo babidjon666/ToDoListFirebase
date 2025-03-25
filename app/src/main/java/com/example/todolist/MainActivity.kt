@@ -44,6 +44,10 @@ fun NavScreen() {
         composable("Login") {
             LoginScreen(navController)
         }
+        composable("Main/{email}") { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            MainScreen(email, navController)
+        }
     }
 }
 

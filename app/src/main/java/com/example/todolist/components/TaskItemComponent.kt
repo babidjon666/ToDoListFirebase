@@ -15,6 +15,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -26,7 +27,8 @@ public fun TaskItemComponent(task: Task, onDelete: () -> Unit) {
         elevation = CardDefaults.cardElevation(4.dp))
     {
         Row(modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween)
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically)
         {
             Text(text=task.title, modifier = Modifier.weight(1f))
             if(task.isImportant){

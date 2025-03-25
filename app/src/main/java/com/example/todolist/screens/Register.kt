@@ -34,20 +34,19 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 @OptIn(UnstableApi::class)
-private fun SignUp(auth: FirebaseAuth, email: String, password: String, repeatPassword: String){
+private fun SignUp(navController: NavController, auth: FirebaseAuth, email: String, password: String, repeatPassword: String){
     if (password==repeatPassword){
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
                 if(it.isSuccessful){
                     Log.d("MyLog", "Register Succesfull")
+                    navController.navigate("Login")
                 }else{
                     Log.d("MyLog", "Register Failed")
                 }
             }
     }
 }
-
-
 
 @Composable
 fun RegisterScreen(navController: NavController) {
@@ -106,7 +105,7 @@ fun RegisterScreen(navController: NavController) {
 
         Button(
             onClick = {
-                SignUp(auth, emailState.value, passwordState.value, repeatPasswordState.value)
+                SignUp(navController, auth, emailState.value, passwordState.value, repeatPasswordState.value)
             },
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium

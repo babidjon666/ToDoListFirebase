@@ -1,66 +1,86 @@
 package com.example.todolist.screens
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedIconToggleButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.todolist.components.TaskItemComponent
 import com.example.todolist.models.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
+private fun SignOut(auth: FirebaseAuth, navController: NavController) {
+    auth.signOut()
+    navController.navigate("Login")
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-public fun MainScreen(){
+fun MainScreen(email: String, navController: NavController) {
     val db = Firebase.firestore
+    val auth = Firebase.auth
+    val userId = auth.currentUser?.uid ?: return
+
     var tasks by remember { mutableStateOf<List<Task>>(emptyList()) }
-    var newTaskText by remember { mutableStateOf("")}
+    var newTaskText by remember { mutableStateOf("") }
     var isImportant by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        db.collection("tasks").addSnapshotListener{
-            snapshot, _ -> snapshot?.let {
-                tasks = it.documents.map { doc ->
-                    Task(id = doc.id,
-                        title = doc.getString("title") ?: "",
-                        isImportant = doc.getBoolean("isImportant") ?: false)
+    LaunchedEffect(userId) {
+        db.collection("tasks")
+            .whereEqualTo("userId", userId)
+            .addSnapshotListener { snapshot, _ ->
+                snapshot?.let {
+                    tasks = it.documents.map { doc ->
+                        Task(
+                            id = doc.id,
+                            title = doc.getString("title") ?: "",
+                            isImportant = doc.getBoolean("isImportant") ?: false,
+                            userId = doc.getString("userId") ?: ""
+                        )
+                    }
                 }
-        }
-        }
+            }
     }
 
-    Scaffold(topBar = { TopAppBar(title = { Text(text="ToDo List")})})
-    {
-        paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues).padding(16.dp)){
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = email)
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Button(onClick = { SignOut(auth, navController) }) {
+                            Text(text = "Logout")
+                        }
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier.padding(paddingValues).padding(16.dp)
+        ) {
             OutlinedTextField(
                 value = newTaskText,
-                onValueChange = { newTaskText = it},
-                label = { Text("NewTask")},
+                onValueChange = { newTaskText = it },
+                label = { Text("New Task") },
                 modifier = Modifier.fillMaxWidth()
             )
+
             Row(modifier = Modifier.padding(top = 8.dp)) {
                 OutlinedIconToggleButton(
                     checked = isImportant,
@@ -76,9 +96,15 @@ public fun MainScreen(){
 
             Button(
                 onClick = {
-                    if (newTaskText.isNotBlank()){
-                        val newTask = Task(title = newTaskText)
-                        db.collection("tasks").document(newTask.id).set(mapOf("title" to newTask.title, "isImportant" to newTask.isImportant))
+                    if (newTaskText.isNotBlank()) {
+                        val newTask = Task(title = newTaskText, isImportant = isImportant, userId = userId)
+                        db.collection("tasks").document(newTask.id).set(
+                            mapOf(
+                                "title" to newTask.title,
+                                "isImportant" to newTask.isImportant,
+                                "userId" to newTask.userId
+                            )
+                        )
                         newTaskText = ""
                     }
                 },
@@ -87,8 +113,7 @@ public fun MainScreen(){
                 Text(text = "Add")
             }
 
-            LazyColumn(modifier = Modifier.padding(top = 16.dp))
-            {
+            LazyColumn(modifier = Modifier.padding(top = 16.dp)) {
                 items(tasks) { task ->
                     TaskItemComponent(task) {
                         db.collection("tasks").document(task.id).delete()
