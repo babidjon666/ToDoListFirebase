@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.todolist.screens.MainScreen
 import com.example.todolist.ui.theme.ToDoListTheme
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -20,12 +21,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        var fs = Firebase.firestore
-        fs.collection("books")
-            .document().set(mapOf("name" to "My Book"))
-        //setContent {
-
-        //}
+        setContent {
+            MainScreen()
+        }
     }
 }
 
